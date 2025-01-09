@@ -1,0 +1,27 @@
+.env
+__pycache__/
+lib/
+/src/app/tools/llmchecks/
+*.old
+*.tmp
+*.work
+*.bk
+tmp/
+src/tmp/
+invoices/
+invoices_copy/
+processed copy/
+processed*/
+processed.old/
+processed_test_data/
+.conda/
+.pytest_cache/
+invoices.xlsx
+*.json
+input/
+output/
+errors/
+comparisons/
+prompt_comparisons.claude/
+
+*.xlsx

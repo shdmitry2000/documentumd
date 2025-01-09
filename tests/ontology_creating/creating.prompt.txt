@@ -1,0 +1,247 @@
+example of invoise and his ontology:
+invoice:
+INVOICE
+
+ABC Tech Solutions Ltd.
+Tax ID: 123456789
+123 Business Street
+Tech District, Silicon City
+California, 94025
+United States
+Phone: +1 (555) 123-4567
+Fax: +1 (555) 123-4568
+Email: billing@abctech.com
+Website: www.abctech.com
+
+Invoice Number: INV-2024-001
+Date: March 15, 2024
+Due Date: April 14, 2024
+PO Number: PO-2024-123
+Terms: Net 30
+
+BILL TO:
+XYZ Corporation
+Tax ID: 987654321
+456 Corporate Avenue
+Business Park
+New York, NY 10001
+United States
+Contact: John Smith
+Phone: +1 (555) 987-6543
+Email: accounts@xyzcorp.com
+
+LINE ITEMS:
+1. Enterprise Software License
+   Quantity: 5
+   Unit Price: $1,200.00
+   Amount: $6,000.00
+   Product Code: SW-ENT-2024
+   Tax Rate: 8.25%
+   Tax Amount: $495.00
+
+2. Implementation Services
+   Quantity: 40
+   Unit Price: $150.00
+   Amount: $6,000.00
+   Product Code: SVC-IMP-01
+   Tax Rate: 8.25%
+   Tax Amount: $495.00
+
+3. Annual Support Package
+   Quantity: 1
+   Unit Price: $3,000.00
+   Amount: $3,000.00
+   Product Code: SUP-ANL-24
+   Tax Rate: 8.25%
+   Tax Amount: $247.50
+
+SUMMARY:
+Subtotal: $15,000.00
+Discount: -$1,000.00
+Shipping: $0.00
+Tax Rate: 8.25%
+Tax Total: $1,237.50
+Total Amount: $15,237.50
+Currency: USD
+
+PAYMENT DETAILS:
+1. Payment Method: Credit Card
+   Date: March 15, 2024
+   Amount: $7,618.75
+   Card Type: Visa
+   Last 4 Digits: 4567
+
+2. Payment Method: Bank Transfer
+   Date: April 14, 2024
+   Amount: $7,618.75
+   Bank: First National Bank
+   Account: 9876543210
+
+Notes: Please include invoice number in all payment references. Early payment discount of 2% available if paid within 10 days.
+
+
+the actialy right ontology created:
+
+from typing import Dict, List, Optional, Union, Any, Annotated, get_args, get_origin, cast ,NamedTuple
+from pydantic import  Field, field_validator, model_validator, ConfigDict
+from decimal import *
+from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict, ValidationError
+
+null=None
+
+
+class Address(BaseModel):
+    street: Optional[str]  = None
+    city: Optional[str]  = None
+    state: Optional[str]  = None
+    postal_code: Optional[str]  = None
+    country: Optional[str]  = "Israel"
+
+
+class PaymentItem(BaseModel):
+    payment_method: str  # e.g., "Credit Card", "Check", "Cash", "Bank Transfer"
+    payment_date: Optional[str] = None
+    payed_amount: Optional[Decimal] = None
+    card_type: Optional[str] = None  # for credit cards
+    card_number_last_digits: Optional[str] = None # For security, store only last digits
+    bank:Optional[str] = None # For Bank transfer
+    bank_account_number:Optional[str] = None # For Bank transfer
+    check_number: Optional[str] = None  # For checks
+    
+    @field_validator("payed_amount")
+    def validate_positive_amount(cls, v: Decimal) -> Decimal:
+        if v is None:
+            return v
+        elif v < 0:
+            raise ValueError("Payment amount must be non-negative.")
+        return v.quantize(Decimal(".01")) # ensure two decimal places
+
+
+
+    
+class LineItem(BaseModel):
+    description: Optional[str]  = None
+    quantity: Optional[Decimal] = 1
+    unit_price: Optional[Decimal] = 0
+    unit_price_before_tax: Optional[Decimal] = 0
+    amount: Optional[Decimal] 
+    tax_rate: Optional[Decimal] = 0
+    tax_amount: Optional[Decimal] = 0
+    product_code: Optional[str]  = None
+    
+
+
+
+    @field_validator("quantity", "unit_price", "amount", "tax_rate", "tax_amount")
+    def validate_positive_numbers(cls, v: Decimal) -> Decimal:
+        if v is  None :
+            return v
+        elif  v < 0:
+            raise ValueError("All  of 'quantity', 'unit_price', 'amount' ,'tax_amount' or 'tax_rate' must be >0.")
+            
+        else:
+            try:
+                if isinstance(v, (str, int, float)) :
+                    v=Decimal(str(v)).quantize(Decimal('.01'))
+            except DecimalException as e:
+                raise ValueError(f"Invalid decimal value: {e}") from None  # Raise a clear error
+  
+        return v
+    
+
+    
+
+class Amounts(BaseModel):
+    subtotal: Decimal
+
+    tax_rate: Optional[Decimal] = 0
+    tax_total: Optional[Decimal] 
+    shipping: Optional[Decimal]  = 0
+    discount: Optional[Decimal] = 0
+    total_amount: Decimal
+    currency:  Optional[str] = "NIS"
+
+    @field_validator("subtotal", "tax_total", "shipping", "discount", "total_amount")
+    def validate_positive_numbers(cls, v: Decimal) -> Decimal:
+        if v is  None :
+            return v
+        elif  v < 0:
+            raise ValueError("All  of 'quantity', 'unit_price', 'total_amount' ,'tax_amount' or 'tax_rate' must be >=0.")
+            
+        else:
+            try:
+                if isinstance(v, (str, int, float)) :
+                    v=Decimal(str(v)).quantize(Decimal('.01'))
+            except DecimalException as e:
+                raise ValueError(f"Invalid decimal value: {e}") from None  # Raise a clear error
+  
+        return v
+    
+
+    @field_validator("subtotal", "total_amount")
+    def validate_numbers(cls, v: Decimal) -> Decimal:
+        if v is not None and v == 0:
+            raise ValueError(f"Amounts.subtotal and total must be a positive number: ") from None  # Raise a clear error
+          
+        try:
+                if isinstance(v, (str, int, float)) :
+                    v=Decimal(str(v)).quantize(Decimal('.01'))
+        except DecimalException as e:
+                raise ValueError(f"Invalid decimal value: {e}") from None  # Raise a clear error
+  
+        return v
+    
+  
+
+
+class supplier(BaseModel):
+    supplier_name: Optional[str]  = None
+    supplier_tax_id: Optional[str]  = None
+    supplier_address: Optional[Address]
+    supplier_email: Optional[str]  = None 
+    supplier_phone: List[Optional[str]] = None # Changed to a list of optional strings
+    supplier_fax: Optional[str] =  None
+    supplier_website: Optional[str]  = None
+    supplier_worker:Optional[str]  = None
+
+class customer(BaseModel):
+    receiver_name: Optional[str]  = None
+    receiver_tax_id: Optional[str]  = None
+    receiver_address: Optional[Address]
+    receiver_email: Optional[str]  = None 
+    receiver_phone: Optional[str]  = None 
+ 
+
+
+class InvoiceOntology(BaseModel):
+    """Defines the ontology structure for invoice data"""
+    invoice_number: str
+    invoice_date: Optional[str]  = None
+    due_date: Optional[str]  = None
+    delivery_date:Optional[str]  = None
+    po_number: Optional[str]  = None
+    terms: Optional[str]  = None
+    
+    supplier: supplier
+    customer: customer
+    
+    line_items: List[LineItem]
+    amounts: Amounts
+    
+    payment_details: List[PaymentItem] = []  # Initialize as empty list
+    notes: Optional[str] = None
+
+    @model_validator(mode='after')
+    def check_date_field(cls, invoice_object):
+        if not any([invoice_object.invoice_date, invoice_object.due_date]) :
+            raise ValueError("At least one of 'invoice_date' or 'due_date' must be provided.")
+        
+        elif  invoice_object.supplier is None:
+            raise ValueError("supplier should be provided.")
+        
+        elif   not any([invoice_object.supplier.supplier_name, invoice_object.supplier.supplier_tax_id, 
+                          invoice_object.supplier.supplier_phone,  invoice_object.supplier.supplier_email]) :
+                raise ValueError("At least one of 'name', 'email', 'tax_id' or 'phone' must be provided for seller.")
+            
+          
+        return invoice_object

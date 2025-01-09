@@ -1,0 +1,18 @@
+[project]
+name = "documents_prompt_creating"
+version = "0.1.0"
+description = "documents-proccessing"
+authors = [{ name = "Dimitry", email = "you@example.com" }]
+requires-python = ">=3.10,<=3.13"
+dependencies = [
+    "crewai[tools]>=0.85.0,<1.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[tool.poetry.dependencies]
+python = "^3.11.10"
+

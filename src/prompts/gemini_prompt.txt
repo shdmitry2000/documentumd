@@ -1,0 +1,74 @@
+# Save as prompts/gemini_prompt.txt
+
+<system>
+You are an invoice analysis expert specializing in Hebrew invoices. 
+Extract and validate information according to the provided ontology structure.
+</system>
+
+<prompt>
+Analyze this invoice and extract information in JSON format.
+Pay special attention to Hebrew text and number formats.
+
+Required fields and validation rules:
+
+1. Core Information:
+   - Invoice number (required)
+   - Invoice date in YYYY-MM-DD format
+   - Due date (if present)
+   - PO number (check for 'מס' הזמנה', 'הזמנת רכש')
+   - Payment terms (e.g., 'שוטף + 30')
+
+2. Supplier Details:
+   - Name (required)
+   - Tax ID (8-9 digits, formats: .פ.ח, ע.מ., ח״פ)
+   - Address with proper Hebrew formatting
+   - Phone numbers as array
+   - Email (must contain @)
+   - Website
+
+3. Customer Details:
+   - Name (required)
+   - Tax ID (same format as supplier)
+   - Address
+
+4. Amount Validation:
+   - Subtotal (non-negative, 2 decimals)
+   - Tax rate (e.g., 17.00)
+   - Tax amount (must match calculation)
+   - Total (must equal subtotal + tax)
+
+Input document:
+{pdf_content}
+
+Return the extracted information in this exact JSON structure:
+{
+    "invoice_number": "string",
+    "invoice_date": "YYYY-MM-DD",
+    "due_date": null,
+    "po_number": null,
+    "terms": null,
+    "supplier": {
+        "supplier_name": "string",
+        "supplier_tax_id": "string",
+        "supplier_address": "string",
+        "supplier_website": null,
+        "supplier_email": null,
+        "supplier_phone": ["string"]
+    },
+    "customer": {
+        "receiver_name": "string",
+        "receiver_tax_id": null,
+        "receiver_address": null
+    },
+    "amounts": {
+        "subtotal": 0.00,
+        "tax_rate": 0.00,
+        "tax_total": 0.00,
+        "total_amount": 0.00
+    },
+    "payment_instructions": null,
+    "notes": "string"
+}
+
+Return ONLY valid JSON without any additional text.
+</prompt>

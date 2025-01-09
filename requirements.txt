@@ -1,0 +1,21 @@
+# 'crewai[tools]'
+crewai 
+crewai-tools
+
+langchain
+langchain-core
+langchain-community
+langchain-google-vertexai
+langchain-experimental
+langchain-cli
+
+langgraph
+langsmith
+
+anthropic[vertex]
+openai
+tiktoken
+
+
+aiofiles
+xlsxwriter

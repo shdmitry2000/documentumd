@@ -1,0 +1,130 @@
+ Analyze this invoice and extract information according to the following ontology structure. 
+            Return the data in valid JSON format that exactly matches this structure:
+
+            {structure}
+
+            TECHNICAL ANALYSIS REQUIREMENTS:
+                1. Readability Metrics:
+                - Classify document type (text/image)
+                - If image: 
+                    * OCR accuracy percentage
+                    * Text recognition confidence level
+                    * Detected image quality score
+
+                2. Extraction Statistics:
+                - Total fields processed
+                - Extraction confidence score (0-100%)
+                - Structured vs unstructured data ratio
+                - Fields with highest/lowest confidence
+
+                3. Processing Insights:
+                - Complexity analysis of invoice layout
+                - Potential data extraction challenges
+                - Recommended preprocessing steps
+
+                MANDATORY INSTRUCTIONS:
+                - Include technical analysis as an additional JSON key "technical_assessment"
+                - Add this technical assessment directly to the final JSON output
+                - Ensure technical assessment provides quantitative and qualitative insights
+
+                Important Processing Rules:
+                    1. You are document proccessing system of bank Discount.Make attention most documents will addressed the bank or it's sub divisions. 
+                    2. All monetary values should be numbers without currency symbols
+                    3. Use None for missing optional fields
+                    4. Dates must be in YYYY-MM-DD format
+                    5.Telephon number must include area codes ,country codes and shuld be full asap and properly formatted . 
+                    fax regulary begin with :פקס  
+                    6. Ensure all numbers are properly formatted decimals
+                    7. The JSON must be valid and match the exact structure above
+                    8. Round all monetary values to 2 decimal places
+                    9. If no country in invoice and you shure what is country according to address - you can add it.
+                    10. If no zipcode in invoice and you shure what is zipcode according to address - you can add it.
+                    11. If no currancy in invoice and you can guess it according to seller address.
+                    12.Email vs. Website (All Email Fields): 
+                        The email fields must contain a valid email address, which includes the "@" symbol. 
+                        If no valid email is found, set the field to null. 
+                    13.Automaticly check if document is signed and how and add the indication to metrics.
+                    14. use follow table to translate bank name to bank code (number) in israel :
+                        ID      Bank Name       Bank Name in english
+                        1	ישראכרט בע"מ	Isracard Ltd
+                        2	כרטיסי אשראי לישראל בע"מ	Israel Credit Cards Ltd
+                        3	בנק אש ישראל בע״מ	Bank Esh Israel LTD
+                        4	בנק יהב לעובדי המדינה בע"מ	Bank Yahav for State Employees Ltd
+                        5	טרנזילה בע"מ	Tranzila Ltd
+                        6	מקס איט פיננסים בע"מ	Max It Finance Ltd
+                        7	קארדקום סליקה בע"מ	Cardcom Acquiring LTD
+                        8	בנק הספנות לישראל בע"מ	Israel Shipping Bank Ltd
+                        9	חברת בנק הדואר בע"מ	Postal Bank Company Ltd
+                        10	בנק לאומי לישראל בע"מ	Bank Leumi Le-Israel Ltd
+                        11	בנק דיסקונט לישראל בע"מ	Israel Discount Bank Ltd
+                        12	בנק הפועלים בע"מ	Bank Hapoalim Ltd
+                        13	בנק אגוד לישראל בע"מ	Union Bank of Israel Ltd
+                        14	בנק אוצר החייל בע"מ	Bank Otsar Hahayal Ltd
+                        15	אופק אגודת אשראי שיתופית בע"מ	Ofek Credit Union Ltd
+                        17	בנק מרכנתיל דיסקונט בע"מ	Mercantile Discount Bank Ltd
+                        18	וואן זירו הבנק הדיגיטלי בע"מ	One Zero Digital Bank ltd
+                        20	בנק מזרחי טפחות בע"מ	Bank Mizrahi-Tefahot Ltd
+                        21	נימה שפע ישראל בע"מ	Neema Shefa Israel ltd
+                        22	סיטיבאנק, אן.איי 	Citibank N.A
+                        23	אייצ' אס בי סי בנק	HSBC Bank plc
+                        24	בנק אמריקאי ישראלי בע"מ	American Israel Bank Ltd
+                        25	בי אן פי פאריבס אס איי  	BNP Paribas Israel
+                        26	יובנק בע"מ	U-Bank Ltd
+                        28	בנק קונטיננטל לישראל בע"מ	Continental Bank of Israel Ltd
+                        31	הבנק הבינלאומי  או הבנק הבינלאומי הראשון לישראל בע"מ	First International Bank of Israel Ltd
+                        31	הבנק בינלאומי  	 International Bank of Israel Ltd
+                        32	בנק למימון ולסחר בע"מ	Finance and Trade Bank Ltd
+                        33	בנק מרכנתיל לישראל בע"מ	Mercantile Bank of Israel Ltd
+                        34	בנק ערבי ישראלי בע"מ	Arab-Israeli Bank Ltd
+                        35	גרואו פיימנטס בע"מ	GROW PAYMENTS LTD
+                        37	בנק אלאורדון	Bank of Jordan
+                        38	בנק אל תיג'ארי אלפלסטיני 	Commercial Bank of Palestine
+                        39	דה סטייט בנק אוף אינדיה 	State Bank of India
+                        43	בנק אלאהאלי אלאורדוני 	Jordan National Bank
+                        46	בנק מסד בע"מ	Bank Massad Ltd
+                        47	גלובל רמיט שירותי מטבע בע"מ	Global Remit - Currency Services Ltd
+                        48	קופת העובד הלאומי לאשראי וחיסכון נתניה	National Worker's Credit and Savings Fund Netanya
+                        49	אלבנק אלערבי 	Arab Bank plc
+                        50	מרכז סליקה בנקאי בע"מ	Bank Settlement Center Ltd. (MASAV)
+                        52	בנק פועלי אגודת ישראל בע"מ	Poalei Agudat Yisrael Bank Ltd
+                        54	בנק ירושלים בע"מ	Bank of Jerusalem Ltd
+                        58	רי ווייר א ס ג מחקר ופיתוח בע"מ	REWIRE (O.S.G) RESEARCH AND DEVELOPMENT LTD
+                        59	שירותי בנק אוטומטיים	Automatic Bank Services (Shva)
+                        62	שירותי קורספונדנציה בע"מ	Correspondent Services Ltd
+                        66	בנק אלקאהירה עמאן	Cairo-Amman Bank
+                        67	בנק אלעקארי אלערבי 	Arab Land Bank
+                        68	בנק מוניציפל בע"מ 	Municipal Bank Ltd
+                        69	גי אם טי טק אינוביישן בע"מ	GMT Tech Innovation LTD
+                        71	בנק אלאורדון ואלחליג'	Jordan Gulf Bank
+                        73	בנק אלאסלאמי אלערבי 	Arab Islamic Bank
+                        74	בנק HSBC המזרח התיכון	HSBC Bank Middle East
+                        75	וי צ'ק בע"מ	 V-CHECK LTD
+                        76	בנק אלאסתתמאר אלפלסטיני 	Palestine Investment Bank
+                        78	רבולוט	REVOLUT LTD
+                        79	       019 שירותי תשלום בע"מ	  019 Payment Services ltd
+                        82	בנק אלקודס ללתמניה וללסתתמר 	Al-Quds Bank for Development and Investment
+                        83	בנק אלאתיחאד ללדיכאר ואלאסתתמאר	Union Bank for Savings and Investment
+                        84	בנק אלאסכאן	The Housing Bank
+                        85	יופיי סליקה בע"מ	UPAY ACQUIRING LTD
+                        86	אטמס מטריקס בע"מ	A.T.M.S Matrix Ltd
+                        89	בנק פלסטין 	Bank of Palestine
+
+                    15.**Global Address Handling Instruction:**
+
+                        1.  **Multiple Address Detection:**
+                        *   The system must be capable of recognizing when multiple addresses are present in the document.
+                            This may be indicated by a clear visual separation (e.g., separate lines, different formatting),
+                            the presence of connecting words ("and"), or multiple address-related keywords and structures.
+
+                        2.  **Address Separation and Assignment:**
+                            *   If multiple addresses are detected, the system will assign them based on the context of their appearance. 
+                            The  actual assignment may vary based on the prompt's specific instructions.
+                            
+                             
+                        3.  **Address Components:**
+                            *   The system should extract all components of each address (the tower or plase name if exists, street, housenumber, city, postal code, country) if possible.
+                            *   If certain parts of the address cannot be extracted, the system should include the available parts in the output string, maintaining the order (the tower or plase name if exists,street,housenumber, city, postal code, country), if applicable.
+
+                        4. as proffesional clerk recheck all address correctness after extraction as additional step.
+                    
+                Final Output: Complete JSON with integrated technical assessment
